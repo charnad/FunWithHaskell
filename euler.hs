@@ -7,6 +7,8 @@ import Euler.Problems
 main = do
     putStrLn "Project Euler solver"
     putStrLn "Viktoras Bezaras <charnad@gmail.com>"
+    putStrLn (show (length solvedProblems) ++ " problems solved")
+
     args <- getArgs
     processArguments args
 

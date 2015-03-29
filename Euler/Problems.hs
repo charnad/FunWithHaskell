@@ -15,17 +15,17 @@ solvedProblems = [
     ("8", problem8),
     ("9", problem9),
     ("10", problem10),
+    ("12", problem12),
     ("14", problem14),
     ("16", problem16),
     ("20", problem20),
     ("21", problem21),
-    ("23", problem23),
     ("24", problem24),
     ("25", problem25),
-    --("29", problem29),
+    ("29", problem29),
     ("30", problem30),
     ("34", problem34),
-    --("35", problem35),
+    ("35", problem35),
     ("36", problem36),
     ("37", problem37),
     --("39", problem39),
@@ -107,11 +107,11 @@ problem9 = head [a * b * c | a <- [1..500], b <- [a..500], c <- [1000 - a - b], 
 problem10 :: Integer
 problem10 = sum (takeWhile (< 2000000) primes)
 
--- triangleNumberSequence :: [Integer]
+-- | What is the value of the first triangle number to have over five hundred divisors?
+problem12 :: Integer
+problem12 = head [x | x <- triangularSequence, (length . divisors) x > 500]
 
--- problem12 :: Integer
--- problem12 = 
-
+-- | Which starting number, under one million, produces the longest chain?
 problem14 :: Integer
 problem14 = fst $ foldl collatz (1, 0) [2..1000000]
       where collatzLength = (length . collatzSequence)
@@ -119,19 +119,18 @@ problem14 = fst $ foldl collatz (1, 0) [2..1000000]
                 | collatzLength x > snd i = (x, collatzLength x)
                 | otherwise = i
 
+-- | What is the sum of the digits of the number 21000?
 problem16 :: Integer
 problem16 = (sum . digits) (2 ^ 1000)
 
+-- | Find the sum of the digits in the number 100!
 problem20 :: Integer
 problem20 = (sum . digits . factorial) 100
     where factorial n = if n == 1 then 1 else n * factorial (n - 1)
 
+-- | Evaluate the sum of all the amicable numbers under 10000.
 problem21 :: Integer
 problem21 = sum [x | x <- [2..9999], x == (dFunc.dFunc) x, x /= dFunc x]
-    where dFunc a = sum(properDivisors a)
-
-problem23 :: Integer
-problem23 = sum [x | x <- [2..9999], x == (dFunc.dFunc) x, x /= dFunc x]
     where dFunc a = sum(properDivisors a)
 
 problem24' :: [Integer]
@@ -145,9 +144,8 @@ problem24 = (fromDigits . (!! 999999) . sort . permutations) [0..9]
 problem25 :: Integer
 problem25 = head [fst p | p <- (zip [1..] fibonacciSequence), ((== 1000) . length . show . snd) p]
 
-problem29 :: Int
-problem29 = length $ foldl addUnique [] [a ^ b | a <- [2..100], b <- [2..100]]
-    where addUnique l e = if (elem e l) then l else e:l
+problem29 :: Integer
+problem29 = (genericLength . nub) [a ^ b | a <- [2..100], b <- [2..100]]
 
 problem30 :: Integer
 problem30 = sum $ [x | x <- [2..999999], x == (sum . map (^ 5) . digits) x]
@@ -155,11 +153,15 @@ problem30 = sum $ [x | x <- [2..999999], x == (sum . map (^ 5) . digits) x]
 problem34 :: Integer
 problem34 = sum $ [x | x <- [3..999999], x == (sum . map factorial . digits) x]
 
-problem35 :: Int
-problem35 = length [x | x <- [2..1000000], isPrime x, and (map isPrime (rotates x))]
-    where append num digit = num * 10 + digit
-          rotate x = foldl append 0 ((last . digits) x : (init . digits) x)
-          rotates n = take ((length . digits) n) (iterate rotate n)
+-- | How many circular primes are there below one million?
+problem35 :: Integer
+problem35 = genericLength [x | x <- approvedPrimes, allPrimes (rotates x)]
+    where approve x | x < 10 = True | otherwise = null $ intersect (digits x) [0, 2, 4, 5, 6, 8]
+          -- Get all primes, that do not contain evens, they are not circular
+          approvedPrimes = filter approve (takeWhile (< 1000000) primes)
+          rotate x = fromDigits ((last . digits) x : (init . digits) x)
+          rotates n = take ((length . show) n) (iterate rotate n)
+          allPrimes p = p == (intersect p approvedPrimes)
 
 problem36 :: Integer
 problem36 = sum [x | x <- [1,3..1000000], isPalindrome x, (isPalindromeList . binary) x]
