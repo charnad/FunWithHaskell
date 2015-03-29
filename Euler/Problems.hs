@@ -31,8 +31,8 @@ solvedProblems = [
     --("39", problem39),
     ("41", problem41),
     ("44", problem44),
-    --("45", problem45),
-    --("47", problem47),
+    ("45", problem45),
+    ("47", problem47),
     ("48", problem48),
     ("52", problem52)
     ]
@@ -171,8 +171,9 @@ problem37 = (sum . take 11) $ filter (>10) [x | x <- primes, rightTruncatablePri
     where rightTruncatablePrime n =  and (map isPrime (takeWhile (/=0) (iterate (flip div 10) n)))
           leftTruncatablePrime n = and (map isPrime (takeWhile (/=0) (iterate (fromDigits . tail . digits) n)))
 
+-- | For which value of p ≤ 1000, is the number of right angle triangle solutions maximised?
 problem39 :: [(Integer, Integer)]
-problem39 = filter ((> 4).snd) [(p, rightTriangles p) | p <- [1..1000]]
+problem39 = filter ((> 4).snd) [(p, rightTriangles p) | p <- [60,120..1000]]
     where rightTriangles p = genericLength [p | a <- [1..(div p 2)], b <- [a..(div p 2)], (a + b) < p, c <- [calcC p a b], ((a+b) + c) == p, (a^2 + b^2) == (c ^ 2)]
           calcC p a b = p - (a + b)
 
@@ -183,11 +184,13 @@ problem44 :: Integer
 problem44 = head [x-y | x <- p10, y <- p10, x > y, isPentagonal (x + y), isPentagonal (x - y)]
     where p10 = take 5000 $ drop 1000 pentagonalSequence
 
-problem45 :: [Integer]
-problem45 = take 3 [t | t <- triangleSequence, isPentagonal t, isHexagonal t]
+-- | Find the next triangle number that is also pentagonal and hexagonal
+problem45 :: Integer
+problem45 = [t | t <- hexagonalSequence, isPentagonal t, isTriangle t] !! 2
 
-problem47 :: [Integer]
-problem47 = take 1 [x | x <- [1..], (genericLength . primeFactors) x == 4, (genericLength . primeFactors) (x + 1) == 4, (genericLength . primeFactors) (x + 2) == 4, (genericLength . primeFactors) (x + 3) == 4]
+-- | Find the first of the first four consecutive integers to have four distinct prime factors
+problem47 :: Integer
+problem47 = head [x | x <- [1..], (genericLength . primeFactors) x == 4, (genericLength . primeFactors) (x + 1) == 4, (genericLength . primeFactors) (x + 2) == 4, (genericLength . primeFactors) (x + 3) == 4]
 
 problem48 :: Integer
 problem48 = mod (sum [x ^ x | x <- [1..1000]]) 10000000000
