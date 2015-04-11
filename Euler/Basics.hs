@@ -1,6 +1,7 @@
 module Euler.Basics where
 
 import Data.List
+import Data.Bits
 
 dividers :: Integer -> [Integer]
 dividers n = [2..ceiling(sqrt(fromIntegral n))]
@@ -54,6 +55,12 @@ binary 0 = [0]
 binary 1 = [1]
 binary x = binary (div x 2) ++ [mod x 2]
 
+binaryFixed :: Integer -> Integer -> [Integer]
+binaryFixed l number = (take toAdd zeroes) ++ bin
+  where bin = binary number
+        toAdd = (fromIntegral l) - (length bin)
+        zeroes = 0:zeroes
+
 collatzSequence :: Integer -> [Integer]
 collatzSequence n | n == 1 = [1]
                   | even n = n : collatzSequence (div n 2)
@@ -93,3 +100,53 @@ primeFactors n = nub ((nextFactor n) : primeFactors (div n (nextFactor n)))
 -}
 triangularSequence :: [Integer]
 triangularSequence = 1:zipWith (+) triangularSequence [2..]
+
+isLychrel :: Integer -> Bool
+isLychrel x = isLychrel' x 50
+
+{-|
+  If we take 47, reverse and add, 47 + 74 = 121, which is palindromic.
+  A number that never forms a palindrome through the reverse and add process is called a Lychrel number.
+-}
+isLychrel' :: Integer -> Integer -> Bool
+isLychrel' _ 0 = True
+isLychrel' x i = if isPalindrome (sumReverse x) then False else isLychrel' (sumReverse x) (i - 1)
+  where sumReverse x = x + (fromDigits . reverse . digits) x
+
+{-|
+  Naive implementation of Euler Problem 502. Generate all castles, check validity, count
+-}
+castles :: Integer -> Integer -> Integer
+castles w h = genericLength [c | c <- (allCastles w h), (even . sum . (map (countBlocks))) c]
+
+{-|
+  Generates all possible castles, even invalid ones. Each level is introduced
+  with a number, which in binary form represents blocks
+-}
+allCastles :: Integer -> Integer -> [[Integer]]
+allCastles _ 0 = []
+allCastles 0 _ = []
+allCastles w h = addLevel [[base]] (h-1)
+  where base = (2 ^ w)-1
+        addLevel castles levelsLeft
+            | levelsLeft == 0 = castles
+            | otherwise = addLevel ([c ++ [p] | c <- castles, p <- [0..(last c)], (p == p .&. (last c))]) (levelsLeft-1)
+
+{-|
+  Counts amount of blocks within a castle row
+-}
+countBlocks :: Integer -> Integer
+countBlocks = genericLength . (filter ((== 1).head)) . group . binary
+
+--getBlocks :: Integer -> [Integer]
+--getBlocks = (map (toInteger.(-1).(^ 2).sum::Integer)) . (filter ((== 1).head)) . group . binary
+
+--allCastles' :: Integer -> Integer -> [[Integer]]
+--allCastles' _ 0 = []
+--allCastles' 0 _ = []
+--allCastles' w h = addLevel [[base]] (h-1)
+
+--allCastles2 :: Integer -> Integer -> [Integer]
+--allCastles2 _ 0 = []
+--allCastles2 0 _ = []
+--allCastles2 base h = getBlocks base

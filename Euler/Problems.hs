@@ -34,7 +34,9 @@ solvedProblems = [
     ("45", problem45),
     ("47", problem47),
     ("48", problem48),
-    ("52", problem52)
+    ("52", problem52),
+    ("55", problem55),
+    ("502", problem502)
     ]
 
 -- | Returns True is a problem is within solved
@@ -198,3 +200,12 @@ problem48 = mod (sum [x ^ x | x <- [1..1000]]) 10000000000
 problem52 :: Integer
 problem52 = head [x | x <- [1..], (f x (x*2)), (f x (x*3)), (f x (x*4)), (f x (x*5)), (f x (x*6))]
     where f x y = null ((show x) \\ (show y))
+
+-- | How many Lychrel numbers are there below ten-thousand?
+problem55 :: Integer
+problem55 = genericLength [x | x <- [1..9999], isLychrel x]
+
+-- | https://projecteuler.net/problem=502
+problem502:: Integer
+problem502 = castles 6 6
+--problem502 = mod ((castles 1012 100) + (castles 10000 10000) + (castles 100 1012)) 1000000007
